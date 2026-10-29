@@ -1,0 +1,403 @@
+  <div id="cesiumContainer"></div>
+  <div id="world-overlay-root" aria-hidden="true">
+    <canvas id="world-overlay-canvas"></canvas>
+  </div>
+  <div id="world-overlay-actions" class="world-overlay-accessibility" role="region" aria-label="Visible map targets">
+    <div id="world-overlay-action-list"></div>
+    <div id="world-overlay-status" role="status" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <!-- Title -->
+  <div id="title-bar">
+    <div class="title-glow"></div>
+    <h1><span class="title-logo brand-logo" data-logo-gaze data-logo-src="/logo.svg" aria-hidden="true"><img src="/logo.svg" alt="" /></span> <span>TWIN EARTH <span class="title-accent">VIEW</span></span></h1>
+    <p class="subtitle">NO PLACE LEFT BEHIND</p>
+  </div>
+
+  <!-- Style indicator -->
+  <div id="style-indicator">
+    <span class="indicator-label">ACTIVE STYLE</span>
+    <span class="indicator-value" id="active-style-name">NORMAL</span>
+  </div>
+
+  <!-- Top-center camera and share actions -->
+  <nav id="top-center-actions" aria-label="Globe actions">
+    <button id="clear-selected-layers" type="button" aria-label="Clear selected data layers" title="Turn off all selected data layers">
+      <span class="material-symbols-outlined" aria-hidden="true">layers_clear</span>
+    </button>
+    <button id="share-btn" type="button" aria-label="Copy share link" title="Copy share link">
+      <span class="share-icon" aria-hidden="true">&#x1F517;</span>
+    </button>
+    <button id="tilt-map-view" type="button" aria-label="Tilt map to oblique view" aria-pressed="false" title="Toggle straight-down and tilted map views">
+      <span class="material-symbols-outlined" aria-hidden="true">view_in_ar</span>
+    </button>
+    <button id="north-up-view" type="button" aria-label="Reset map to north up" title="Reset map bearing to north">
+      <span class="camera-compass-n" aria-hidden="true">N</span>
+      <span class="camera-compass-needle material-symbols-outlined" aria-hidden="true">navigation</span>
+    </button>
+    <button id="reset-globe-view" type="button" aria-label="Reset to full globe view" title="Reset camera and return to full globe view">
+      <span class="material-symbols-outlined" aria-hidden="true">public</span>
+    </button>
+    <button id="quick-guide-btn" type="button" aria-label="Open User Guide and Shortcuts" title="Quick Guide & Shortcuts (?)">
+      <span class="material-symbols-outlined" aria-hidden="true">help</span>
+    </button>
+    <button id="disaster-hub-btn" type="button" aria-label="Open Disaster Monitor (Volcanoes, Tsunamis, Floods, Cyclones)" title="Disaster Monitor (Volcanoes, Tsunamis, Floods, Cyclones)">
+      <span class="material-symbols-outlined" aria-hidden="true">flare</span>
+    </button>
+  </nav>
+
+  <!-- Disaster Command Center Modal -->
+  <aside id="disaster-console" class="disaster-console-modal" role="dialog" aria-labelledby="disaster-console-title" aria-modal="true" hidden>
+    <div class="disaster-console-backdrop" data-disaster-console-close></div>
+    <div class="disaster-console-card">
+      <div class="disaster-console-scanline" aria-hidden="true"></div>
+      <header class="disaster-console-header">
+        <div class="disaster-console-badge">
+          <span class="disaster-pulse-dot"></span>
+          <span>GLOBAL DISASTER INTELLIGENCE</span>
+        </div>
+        <button type="button" id="disaster-console-close" class="quick-guide-close-btn" data-disaster-console-close aria-label="Close disaster monitor">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </header>
+
+      <div class="disaster-console-body">
+        <div class="disaster-console-hero">
+          <h2 id="disaster-console-title">Natural Hazard & Disaster Monitor</h2>
+          <p class="disaster-console-desc">Real-time planetary crisis tracking. Monitored across NASA EONET, NOAA NHC, JTWC, USGS, and Smithsonian Global Volcanism Program.</p>
+        </div>
+
+        <!-- Live Global Disaster Search Bar -->
+        <div class="disaster-search-section">
+          <div class="disaster-search-bar">
+            <span class="material-symbols-outlined disaster-search-icon" aria-hidden="true">search</span>
+            <input type="text" id="disaster-search-input" class="disaster-search-input" placeholder="Search disasters (e.g. Cyclone Arnab, In-fa, Milton, Mount Etna, Kilauea, Floods...)" autocomplete="off" spellcheck="false" />
+            <button type="button" id="disaster-search-clear" class="disaster-search-clear" hidden aria-label="Clear search">✕</button>
+          </div>
+          <div id="disaster-search-results" class="disaster-search-results" hidden>
+            <!-- Dynamic search results populated by disasterUI.js -->
+          </div>
+        </div>
+
+        <div class="disaster-toggles-grid">
+          <!-- Volcanoes -->
+          <div class="disaster-toggle-card active" data-disaster-type="volcanoes">
+            <div class="disaster-card-header">
+              <span class="disaster-card-icon">🌋</span>
+              <div class="disaster-card-title">
+                <h4>Active Volcanoes</h4>
+                <small>NASA EONET / Smithsonian GVP</small>
+              </div>
+              <span id="disaster-volcanoes-count" class="disaster-count-badge">23</span>
+            </div>
+            <p class="disaster-card-detail">Pulsing thermal craters, active ash plumes, and Holocene volcanic alert cones.</p>
+            <button type="button" class="disaster-toggle-btn active" data-toggle-disaster="volcanoes">LAYER ACTIVE</button>
+          </div>
+
+          <!-- Tsunamis -->
+          <div class="disaster-toggle-card active" data-disaster-type="tsunamis">
+            <div class="disaster-card-header">
+              <span class="disaster-card-icon">🌊</span>
+              <div class="disaster-card-title">
+                <h4>Tsunami Alerts</h4>
+                <small>USGS & NOAA Subduction Zones</small>
+              </div>
+              <span id="disaster-tsunamis-count" class="disaster-count-badge">9</span>
+            </div>
+            <p class="disaster-card-detail">Oceanic wave propagation rings, mega-trench monitors, and coastal tsunami advisories.</p>
+            <button type="button" class="disaster-toggle-btn active" data-toggle-disaster="tsunamis">LAYER ACTIVE</button>
+          </div>
+
+          <!-- Floods -->
+          <div class="disaster-toggle-card active" data-disaster-type="floods">
+            <div class="disaster-card-header">
+              <span class="disaster-card-icon">💧</span>
+              <div class="disaster-card-title">
+                <h4>Flood Inundations</h4>
+                <small>NASA EONET / Copernicus</small>
+              </div>
+              <span id="disaster-floods-count" class="disaster-count-badge">10</span>
+            </div>
+            <p class="disaster-card-detail">Severe river basin overflows, monsoonal flash inundation zones, and water surge beacons.</p>
+            <button type="button" class="disaster-toggle-btn active" data-toggle-disaster="floods">LAYER ACTIVE</button>
+          </div>
+
+          <!-- Tropical Cyclones & Typhoons -->
+          <div class="disaster-toggle-card active" data-disaster-type="cyclones">
+            <div class="disaster-card-header">
+              <span class="disaster-card-icon">🌀</span>
+              <div class="disaster-card-title">
+                <h4>Tropical Cyclones</h4>
+                <small>NASA EONET / JTWC / NHC</small>
+              </div>
+              <span id="disaster-cyclones-count" class="disaster-count-badge">8</span>
+            </div>
+            <p class="disaster-card-detail">Severe tropical cyclones, hurricanes, typhoons, wind vortex fields, and satellite tracks.</p>
+            <button type="button" class="disaster-toggle-btn active" data-toggle-disaster="cyclones">LAYER ACTIVE</button>
+          </div>
+        </div>
+
+        <div class="disaster-actions-bar">
+          <button type="button" id="disaster-cycle-next-btn" class="disaster-cycle-btn">
+            <span class="material-symbols-outlined" aria-hidden="true">navigation</span>
+            <span>TARGET NEXT INCIDENT</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Complete Disaster Incident Telemetry & Intelligence Card (Slide-In) -->
+  <div id="disaster-incident-card" class="disaster-incident-card" hidden>
+    <div class="incident-card-scanline" aria-hidden="true"></div>
+    <div class="incident-card-header">
+      <div class="incident-header-left">
+        <span class="incident-type-tag" data-incident-type-tag>🌀 TROPICAL CYCLONE</span>
+        <span class="incident-alert-badge" data-incident-alert>WARNING</span>
+      </div>
+      <button type="button" class="incident-card-close" data-incident-close aria-label="Close incident card">✕</button>
+    </div>
+
+    <div class="incident-card-body">
+      <h3 class="incident-title" data-incident-title>Super Typhoon In-fa</h3>
+      <div class="incident-meta-row">
+        <span class="incident-meta-location" data-incident-location>Western North Pacific</span> · 
+        <span class="incident-meta-coords" data-incident-coords>14.90°N, 159.90°E</span>
+      </div>
+
+      <!-- Live Status Banner -->
+      <div class="incident-status-box">
+        <span class="incident-status-label">LIVE STATUS</span>
+        <p class="incident-status-text" data-incident-status>Violent Eyewall Circulation · High Sea Swells</p>
+      </div>
+
+      <!-- Detailed Key Telemetry Metrics Grid -->
+      <div class="incident-metrics-grid" data-incident-metrics>
+        <div class="incident-metric-chip" data-metric-box="1">
+          <span class="metric-chip-label" data-metric-label-1>INTENSITY</span>
+          <strong class="metric-chip-value" data-metric-val-1>120 kts (222 km/h)</strong>
+        </div>
+        <div class="incident-metric-chip" data-metric-box="2">
+          <span class="metric-chip-label" data-metric-label-2>PRESSURE</span>
+          <strong class="metric-chip-value" data-metric-val-2>935 hPa</strong>
+        </div>
+        <div class="incident-metric-chip" data-metric-box="3">
+          <span class="metric-chip-label" data-metric-label-3>HAZARD EXTENT</span>
+          <strong class="metric-chip-value" data-metric-val-3>350 km</strong>
+        </div>
+        <div class="incident-metric-chip" data-metric-box="4">
+          <span class="metric-chip-label" data-metric-label-4>CLASSIFICATION</span>
+          <strong class="metric-chip-value" data-metric-val-4>Category 4 Super Typhoon</strong>
+        </div>
+      </div>
+
+      <!-- Scientific & Operational Analysis -->
+      <div class="incident-intel-section">
+        <span class="incident-section-label">ANALYSIS & IMPACT</span>
+        <p class="incident-intel-text" data-incident-description>High-energy convective vortex characterized by low atmospheric pressure, rapid cyclonic circulation, and hazardous eyewalls.</p>
+      </div>
+
+      <!-- Emergency Safety Guidance -->
+      <div class="incident-safety-section">
+        <span class="incident-section-label">SAFETY DIRECTIVE</span>
+        <p class="incident-safety-text" data-incident-safety>Maritime vessels divert outside gale radii. Coastal infrastructure prepare for severe tropical force winds.</p>
+      </div>
+
+      <!-- Sources & Timestamp Footer -->
+      <div class="incident-footer-row">
+        <span class="incident-sources-tag" data-incident-sources>NASA EONET / JTWC / NOAA NHC</span>
+        <span class="incident-time-tag" data-incident-time>Live Telemetry</span>
+      </div>
+    </div>
+
+    <div class="incident-actions">
+      <button type="button" id="incident-flyto-btn" class="incident-action-btn primary">
+        <span class="material-symbols-outlined" aria-hidden="true">my_location</span>
+        <span>FLY TO SITE</span>
+      </button>
+      <button type="button" id="incident-orbit-btn" class="incident-action-btn secondary" title="Orbit around site">
+        <span class="material-symbols-outlined" aria-hidden="true">sync</span>
+        <span>ORBIT</span>
+      </button>
+      <button type="button" id="incident-copy-coords-btn" class="incident-action-btn secondary" title="Copy coordinates">
+        <span class="material-symbols-outlined" aria-hidden="true">content_copy</span>
+        <span>COORDS</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Guide & Flight Manual Modal -->
+  <aside id="quick-guide-modal" class="quick-guide-modal" role="dialog" aria-labelledby="quick-guide-title" aria-modal="true" hidden>
+    <div class="quick-guide-backdrop" data-quick-guide-close></div>
+    <div class="quick-guide-card">
+      <div class="quick-guide-scanline" aria-hidden="true"></div>
+      <header class="quick-guide-header">
+        <div class="quick-guide-badge">
+          <span class="quick-guide-pulse-dot"></span>
+          <span>OPERATOR MANUAL · QUICK REFERENCE</span>
+        </div>
+        <button type="button" id="quick-guide-close" class="quick-guide-close-btn" data-quick-guide-close aria-label="Close guide">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </header>
+
+      <div class="quick-guide-hero">
+        <h2 id="quick-guide-title">Twin Earth Operator Manual</h2>
+        <p class="quick-guide-subtitle">Real-time planetary intelligence. Explore live aircraft, vessels, satellites, environmental signals, and cockpit cameras.</p>
+      </div>
+
+      <nav class="quick-guide-tabs" role="tablist" aria-label="Guide Sections">
+        <button type="button" class="quick-guide-tab active" data-tab="nav" role="tab" aria-selected="true">🧭 Navigation</button>
+        <button type="button" class="quick-guide-tab" data-tab="shortcuts" role="tab" aria-selected="false">⌨️ Shortcuts</button>
+        <button type="button" class="quick-guide-tab" data-tab="feeds" role="tab" aria-selected="false">📡 Live Feeds</button>
+        <button type="button" class="quick-guide-tab" data-tab="cockpit" role="tab" aria-selected="false">🛩️ Cockpit & Track</button>
+        <button type="button" class="quick-guide-tab" data-tab="voice" role="tab" aria-selected="false">🎙️ Voice AI</button>
+      </nav>
+
+      <div class="quick-guide-content">
+        <!-- Tab: Navigation -->
+        <div class="quick-guide-panel active" data-panel="nav">
+          <div class="guide-grid">
+            <div class="guide-item">
+              <div class="guide-icon">🖱️</div>
+              <div class="guide-info">
+                <h4>Pan & Rotate</h4>
+                <p><strong>Left Click + Drag</strong> to spin the globe and center any region or coordinates.</p>
+              </div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-icon">🔍</div>
+              <div class="guide-info">
+                <h4>Zoom In / Out</h4>
+                <p><strong>Scroll Wheel</strong> or <strong>Right Click + Drag</strong> to glide smoothly from space to street level.</p>
+              </div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-icon">📐</div>
+              <div class="guide-info">
+                <h4>Tilt / Oblique 3D</h4>
+                <p><strong>Middle Click + Drag</strong> or <strong>Ctrl + Left Click</strong> to tilt the globe for 3D terrain horizon perspectives.</p>
+              </div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-icon">🎯</div>
+              <div class="guide-info">
+                <h4>Click-to-Track</h4>
+                <p>Click on any live aircraft, maritime vessel, or hotspot to lock tracking, open telemetry, and view contacts.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Shortcuts -->
+        <div class="quick-guide-panel" data-panel="shortcuts" hidden>
+          <div class="shortcuts-table">
+            <div class="shortcut-row"><span class="key-combo"><kbd>1</kbd> to <kbd>7</kbd></span><span>Switch Visual Filters (Normal, CRT, NVG, FLIR, Anime, Noir, Snow)</span></div>
+            <div class="shortcut-row"><span class="key-combo"><kbd>H</kbd></span><span>Toggle Military HUD telemetry overlay</span></div>
+            <div class="shortcut-row"><span class="key-combo"><kbd>D</kbd></span><span>Toggle Computer Vision Detection bounding boxes & IDs</span></div>
+            <div class="shortcut-row"><span class="key-combo"><kbd>N</kbd></span><span>Reset map bearing to North</span></div>
+            <div class="shortcut-row"><span class="key-combo"><kbd>?</kbd> or <kbd>F1</kbd></span><span>Open this Operator Guide & Shortcuts manual</span></div>
+            <div class="shortcut-row"><span class="key-combo"><kbd>Esc</kbd></span><span>Close active panels, dismiss dialogs, or exit Cockpit view</span></div>
+          </div>
+        </div>
+
+        <!-- Tab: Feeds -->
+        <div class="quick-guide-panel" data-panel="feeds" hidden>
+          <div class="guide-grid">
+            <div class="guide-item">
+              <div class="guide-icon">✈️</div>
+              <div class="guide-info">
+                <h4>Live ADS-B Flights</h4>
+                <p>Real-time aviation traffic with callsigns, speed, altitude, and 3D aircraft models.</p>
+              </div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-icon">🚢</div>
+              <div class="guide-info">
+                <h4>Maritime AIS Vessels</h4>
+                <p>Global cargo ships, tankers, tugs, and passenger ferries with live headings and destination ports.</p>
+              </div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-icon">🛰️</div>
+              <div class="guide-info">
+                <h4>Satellites & ISS</h4>
+                <p>Orbital element tracking for Starlink, GPS, weather satellites, and real-time ISS pass predictions.</p>
+              </div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-icon">🌋</div>
+              <div class="guide-info">
+                <h4>Natural Disasters & Hazards</h4>
+                <p>Live Active Volcanoes (NASA EONET / GVP), Tsunami Alerts (USGS & NOAA), Flood Inundations, Earthquakes & NASA FIRMS Wildfires.</p>
+              </div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-icon">📹</div>
+              <div class="guide-info">
+                <h4>Public Street CCTV</h4>
+                <p>Live roadside cameras worldwide with directional viewing angles and camera handoffs.</p>
+              </div>
+            </div>
+            <div class="guide-item">
+              <div class="guide-icon">🌐</div>
+              <div class="guide-info">
+                <h4>Undersea Cables</h4>
+                <p>Submarine telecommunications cable network powering the planetary internet.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Cockpit -->
+        <div class="quick-guide-panel" data-panel="cockpit" hidden>
+          <div class="guide-feature-box">
+            <h4>🛩️ Ride-Along Cockpit Simulator</h4>
+            <p>Select any tracked flight and click <strong>ENTER COCKPIT</strong>. The camera clamps directly into the pilot's seat with pitch, roll, terrain clearance, and radio audio. Press <strong>Esc</strong> to return to the globe.</p>
+          </div>
+          <div class="guide-feature-box">
+            <h4>📡 250 km Proximity Contacts</h4>
+            <p>When tracking any asset, open the Contacts drawer to see all other traffic within a 250 km radius. Click any contact to hop instantly to it.</p>
+          </div>
+        </div>
+
+        <!-- Tab: Voice AI -->
+        <div class="quick-guide-panel" data-panel="voice" hidden>
+          <div class="voice-guide-examples">
+            <h4>Spoken intelligence commands for TE MIC:</h4>
+            <div class="voice-cmd-pill">"Fly to Tokyo at night"</div>
+            <div class="voice-cmd-pill">"Track the nearest Boeing 787"</div>
+            <div class="voice-cmd-pill">"Turn on thermal FLIR vision"</div>
+            <div class="voice-cmd-pill">"Show active earthquakes in the Pacific"</div>
+            <div class="voice-cmd-pill">"Draw a boundary around London"</div>
+            <div class="voice-cmd-pill">"Reset view to full globe"</div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="quick-guide-footer">
+        <span class="quick-guide-hint"><kbd>Esc</kbd> or click outside to dismiss</span>
+        <button type="button" class="quick-guide-got-it-btn" data-quick-guide-close>GOT IT · EXPLORE GLOBE</button>
+      </footer>
+    </div>
+  </aside>
+  <div id="global-loading-status" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <span id="global-loading-label">LOADING LIVE DATA</span>
+    <span id="global-loading-detail"></span>
+  </div>
+  <div id="traffic-sync-chip" aria-live="polite">
+    <span id="traffic-sync-label">syncing road network</span>
+    <span id="traffic-sync-progress">0%</span>
+  </div>
+  <div id="cctv-sync-chip" aria-live="polite">
+    <span id="cctv-sync-label">loading frames</span>
+    <span id="cctv-sync-progress">0/0</span>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Safe frame guides for recording composition -->
+  <div id="safe-frame-overlay">
+    <div id="safe-frame-box"></div>
+  </div>
